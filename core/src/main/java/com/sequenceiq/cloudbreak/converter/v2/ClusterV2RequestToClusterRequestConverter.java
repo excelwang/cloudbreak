@@ -23,25 +23,27 @@ public class ClusterV2RequestToClusterRequestConverter extends AbstractConversio
         cluster.setEmailTo(source.getEmailTo());
         cluster.setFileSystem(source.getFileSystem());
         cluster.setName(source.getName());
-        cluster.setRdsConfigIds(source.getRdsConfigIds());
-        cluster.setRdsConfigJsons(source.getRdsConfigJsons());
+        if (source.getRdsConfig() != null) {
+            cluster.setRdsConfigIds(source.getRdsConfig().getRdsConfigIds());
+            cluster.setRdsConfigJsons(source.getRdsConfig().getRdsConfigs());
+        }
         cluster.setLdapConfigName(source.getLdapConfigName());
-        if (source.getAmbariRequest() != null) {
-            cluster.setAmbariDatabaseDetails(source.getAmbariRequest().getAmbariDatabaseDetails());
-            cluster.setAmbariRepoDetailsJson(source.getAmbariRequest().getAmbariRepoDetailsJson());
-            cluster.setAmbariStackDetails(source.getAmbariRequest().getAmbariStackDetails());
-            cluster.setBlueprintCustomPropertiesAsString(source.getAmbariRequest().getBlueprintCustomProperties());
-            cluster.setBlueprintId(source.getAmbariRequest().getBlueprintId());
-            cluster.setBlueprintName(source.getAmbariRequest().getBlueprintName());
-            cluster.setBlueprintInputs(source.getAmbariRequest().getBlueprintInputs());
-            cluster.setConfigStrategy(source.getAmbariRequest().getConfigStrategy());
-            cluster.setConnectedCluster(source.getAmbariRequest().getConnectedCluster());
-            cluster.setEnableSecurity(source.getAmbariRequest().getEnableSecurity());
-            cluster.setGateway(source.getAmbariRequest().getGateway());
-            cluster.setKerberos(source.getAmbariRequest().getKerberos());
-            cluster.setPassword(source.getAmbariRequest().getPassword());
-            cluster.setUserName(source.getAmbariRequest().getUserName());
-            cluster.setValidateBlueprint(source.getAmbariRequest().getValidateBlueprint());
+        if (source.getAmbari() != null) {
+            cluster.setAmbariDatabaseDetails(source.getAmbari().getAmbariDatabaseDetails());
+            cluster.setAmbariRepoDetailsJson(source.getAmbari().getAmbariRepoDetailsJson());
+            cluster.setAmbariStackDetails(source.getAmbari().getAmbariStackDetails());
+            cluster.setBlueprintCustomPropertiesAsString(source.getAmbari().getBlueprintCustomProperties());
+            cluster.setBlueprintId(source.getAmbari().getBlueprintId());
+            cluster.setBlueprintName(source.getAmbari().getBlueprintName());
+            cluster.setBlueprintInputs(source.getAmbari().getBlueprintInputs());
+            cluster.setConfigStrategy(source.getAmbari().getConfigStrategy());
+            cluster.setConnectedCluster(source.getAmbari().getConnectedCluster());
+            cluster.setEnableSecurity(source.getAmbari().getEnableSecurity());
+            cluster.setGateway(source.getAmbari().getGateway());
+            cluster.setKerberos(source.getAmbari().getKerberos());
+            cluster.setPassword(source.getAmbari().getPassword());
+            cluster.setUserName(source.getAmbari().getUserName());
+            cluster.setValidateBlueprint(source.getAmbari().getValidateBlueprint());
         }
         cluster.setHostGroups(new HashSet<>());
         return cluster;
