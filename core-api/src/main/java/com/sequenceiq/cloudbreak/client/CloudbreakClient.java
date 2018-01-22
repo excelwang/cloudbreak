@@ -14,6 +14,7 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
+import com.sequenceiq.cloudbreak.api.endpoint.v1.SecurityRuleEndpoint;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,6 +122,8 @@ public class CloudbreakClient {
 
     private EndpointWrapper<ImageCatalogEndpoint> imageCatalogEndpoint;
 
+    private EndpointWrapper<SecurityRuleEndpoint> securityRuleEndpoint;
+
     private CloudbreakClient(String cloudbreakAddress, String identityServerAddress, String user, String password, String clientId, ConfigKey configKey) {
         client = RestClientUtil.get(configKey);
         this.cloudbreakAddress = cloudbreakAddress;
@@ -197,6 +200,7 @@ public class CloudbreakClient {
         smartSenseSubscriptionEndpoint = newResource(smartSenseSubscriptionEndpoint, SmartSenseSubscriptionEndpoint.class, headers);
         flexSubscriptionEndpoint = newResource(flexSubscriptionEndpoint, FlexSubscriptionEndpoint.class, headers);
         imageCatalogEndpoint = newResource(imageCatalogEndpoint, ImageCatalogEndpoint.class, headers);
+        securityRuleEndpoint = newResource(securityRuleEndpoint, SecurityRuleEndpoint.class, headers);
         LOGGER.info("Endpoints have been renewed for CloudbreakClient");
     }
 
@@ -326,6 +330,11 @@ public class CloudbreakClient {
     public UtilEndpoint utilEndpoint() {
         refresh();
         return utilEndpoint.getEndpointProxy();
+    }
+
+    public SecurityRuleEndpoint securityRuleEndpoint() {
+        refresh();
+        return securityRuleEndpoint.getEndpointProxy();
     }
 
     private class EndpointWrapper<C> {
