@@ -32,6 +32,7 @@ import com.sequenceiq.cloudbreak.api.model.StackRequest;
 import com.sequenceiq.cloudbreak.cloud.model.Platform;
 import com.sequenceiq.cloudbreak.cloud.model.Region;
 import com.sequenceiq.cloudbreak.cloud.model.StackTags;
+import com.sequenceiq.cloudbreak.common.type.DefaultApplicationTag;
 import com.sequenceiq.cloudbreak.common.type.OrchestratorConstants;
 import com.sequenceiq.cloudbreak.controller.BadRequestException;
 import com.sequenceiq.cloudbreak.core.CloudbreakException;
@@ -79,7 +80,7 @@ public class StackRequestToStackConverter extends AbstractConversionServiceAware
         setPlatform(source);
         stack.setCloudPlatform(source.getCloudPlatform());
         Map<String, String> sourceTags = source.getApplicationTags();
-        stack.setTags(getTags(mergeTags(sourceTags, source.getUserDefinedTags(), getDefaultTags(source.getAccount()))));
+        stack.setTags(getTags(mergeTags(getApplicationTags(source), source.getUserDefinedTags(), getDefaultTags(source.getAccount()))));
         if (sourceTags != null && sourceTags.get("datalakeId") != null) {
             stack.setDatalakeId(Long.valueOf(String.valueOf(sourceTags.get("datalakeId"))));
         }
@@ -110,6 +111,7 @@ public class StackRequestToStackConverter extends AbstractConversionServiceAware
         stack.setUuid(UUID.randomUUID().toString());
         return stack;
     }
+
 
     private void validateStackAuthentication(StackRequest source) {
         if (source.getStackAuthentication() == null) {
@@ -143,6 +145,13 @@ public class StackRequestToStackConverter extends AbstractConversionServiceAware
         } catch (IOException e) {
             LOGGER.debug("Exception during reading default tags.", e);
         }
+        return result;
+    }
+
+    private Map<String,String> getApplicationTags(StackRequest source) {
+        Map<String, String> result = source.getApplicationTags() == null ? new HashMap<>() : source.getApplicationTags();
+        result.put(DefaultApplicationTag.CB_ACOUNT_NAME.key(), Strings.isNullOrEmpty(source.getAccount()) ? "unknown" : source.getAccount());
+        result.put(DefaultApplicationTag.CB_USER_NAME.key(), Strings.isNullOrEmpty(source.getOwner()) ? "unknown" : source.getOwner());
         return result;
     }
 

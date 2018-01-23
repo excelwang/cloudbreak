@@ -70,6 +70,7 @@ import com.sequenceiq.cloudbreak.cloud.context.CloudContext;
 import com.sequenceiq.cloudbreak.cloud.exception.CloudConnectorException;
 import com.sequenceiq.cloudbreak.cloud.model.CloudResource;
 import com.sequenceiq.cloudbreak.cloud.notification.PersistenceNotifier;
+import com.sequenceiq.cloudbreak.common.type.DefaultApplicationTag;
 import com.sequenceiq.cloudbreak.common.type.ResourceType;
 
 public class AzureClient {
@@ -149,6 +150,7 @@ public class AzureClient {
     }
 
     public ResourceGroup createResourceGroup(String name, String region, Map<String, String> tags) {
+        tags.put(DefaultApplicationTag.CB_RESOURCE_TYPE.key(), ResourceType.ARM_TEMPLATE.name());
         return handleAuthException(() ->
                 azure.resourceGroups().define(name)
                 .withRegion(region)
@@ -211,6 +213,8 @@ public class AzureClient {
 
     public StorageAccount createStorageAccount(String resourceGroup, String storageName, String storageLocation, SkuName accType, Boolean encryted,
             Map<String, String> tags) {
+        tags.put(DefaultApplicationTag.CB_RESOURCE_TYPE.key(), ResourceType.AZURE_STORAGE.name());
+
         return handleAuthException(() -> {
             StorageAccount.DefinitionStages.WithCreate withCreate = azure.storageAccounts()
                     .define(storageName)
