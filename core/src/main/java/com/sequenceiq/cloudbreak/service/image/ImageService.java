@@ -96,7 +96,7 @@ public class ImageService {
             statedImage = imageCatalogService.getImageByCatalogName(imageId.get(), catalogName);
         } else {
             LOGGER.warn("Image id hasn't been specified for the stack, falling back to a base image.");
-            statedImage = imageCatalogService.getBaseImage(platformString);
+            statedImage = imageCatalogService.getDefaultImage(platformString);
         }
         return statedImage;
     }

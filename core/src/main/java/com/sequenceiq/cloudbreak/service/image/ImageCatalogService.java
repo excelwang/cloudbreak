@@ -7,6 +7,7 @@ import static com.sequenceiq.cloudbreak.util.SqlUtil.getProperSqlErrorMessage;
 import static java.util.Collections.emptyList;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -82,17 +83,20 @@ public class ImageCatalogService {
         return getImages(getImageDefaultCatalogUrl(), getDefaultImageCatalogName(), provider, cbVersion);
     }
 
-    public StatedImage getBaseImage(String platform) throws CloudbreakImageNotFoundException, CloudbreakImageCatalogException {
+    public StatedImage getDefaultImage(String platform) throws CloudbreakImageNotFoundException, CloudbreakImageCatalogException {
         StatedImages statedImages = getImages(platform);
-        List<Image> baseImages = statedImages.getImages().getBaseImages();
-        if (baseImages.isEmpty()) {
-            String msg = String.format("Could not find any base image for platform '%s' and Cloudbreak version '%s'.", platform, cbVersion);
+        Optional<Image> selectedImage = statedImages.getImages().getHdpImages().stream().max(Comparator.comparing(Image::getDate));
+        if (!selectedImage.isPresent()) {
+            selectedImage = statedImages.getImages().getHdfImages().stream().max(Comparator.comparing(Image::getDate));
+        }
+        if (!selectedImage.isPresent()) {
+            selectedImage = statedImages.getImages().getBaseImages().stream().max(Comparator.comparing(Image::getDate));
+        }
+        if (!selectedImage.isPresent()) {
+            String msg = String.format("Could not find any image for platform '%s' and Cloudbreak version '%s'.", platform, cbVersion);
             throw new CloudbreakImageNotFoundException(msg);
         }
-        Image image = baseImages.stream().findFirst().get();
-        return statedImage(image,
-                statedImages.getImageCatalogUrl(),
-                statedImages.getImageCatalogName());
+        return statedImage(selectedImage.get(), statedImages.getImageCatalogUrl(), statedImages.getImageCatalogName());
     }
 
     public StatedImages getImages(String name, String provider) throws CloudbreakImageCatalogException {
@@ -252,7 +256,7 @@ public class ImageCatalogService {
     }
 
     public StatedImages getImages(String imageCatalogUrl, String imageCatalogName, String platform, String cbVersion) throws CloudbreakImageCatalogException {
-        LOGGER.info("Determine images for imageCatalogUrl: '{}', platform: '{}' and Cloudbreak version: '{}'.", platform, cbVersion);
+        LOGGER.info("Determine images for imageCatalogUrl: '{}', platform: '{}' and Cloudbreak version: '{}'.", imageCatalogUrl, platform, cbVersion);
         StatedImages images;
         CloudbreakImageCatalogV2 imageCatalog = imageCatalogProvider.getImageCatalogV2(imageCatalogUrl);
         if (imageCatalog != null) {
