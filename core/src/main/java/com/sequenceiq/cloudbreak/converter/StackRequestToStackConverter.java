@@ -80,7 +80,7 @@ public class StackRequestToStackConverter extends AbstractConversionServiceAware
         setPlatform(source);
         stack.setCloudPlatform(source.getCloudPlatform());
         Map<String, String> sourceTags = source.getApplicationTags();
-        stack.setTags(getTags(mergeTags(getApplicationTags(source), source.getUserDefinedTags(), getDefaultTags(source.getAccount()))));
+        stack.setTags(getTags(mergeTags(sourceTags, source.getUserDefinedTags(), getDefaultTags(source))));
         if (sourceTags != null && sourceTags.get("datalakeId") != null) {
             stack.setDatalakeId(Long.valueOf(String.valueOf(sourceTags.get("datalakeId"))));
         }
@@ -135,23 +135,18 @@ public class StackRequestToStackConverter extends AbstractConversionServiceAware
         }
     }
 
-    private Map<String, String> getDefaultTags(String account) {
+    private Map<String, String> getDefaultTags(StackRequest source) {
         Map<String, String> result = new HashMap<>();
         try {
-            AccountPreferences pref = accountPreferencesService.getByAccount(account);
+            AccountPreferences pref = accountPreferencesService.getByAccount(source.getAccount());
             if (pref != null && pref.getDefaultTags() != null && StringUtils.isNoneBlank(pref.getDefaultTags().getValue())) {
                 result = pref.getDefaultTags().get(Map.class);
             }
+            result.put(DefaultApplicationTag.CB_ACOUNT_NAME.key(), Strings.isNullOrEmpty(source.getAccount()) ? "unknown" : source.getAccount());
+            result.put(DefaultApplicationTag.CB_USER_NAME.key(), Strings.isNullOrEmpty(source.getOwnerEmail()) ? "unknown" : source.getOwnerEmail());
         } catch (IOException e) {
             LOGGER.debug("Exception during reading default tags.", e);
         }
-        return result;
-    }
-
-    private Map<String,String> getApplicationTags(StackRequest source) {
-        Map<String, String> result = source.getApplicationTags() == null ? new HashMap<>() : source.getApplicationTags();
-        result.put(DefaultApplicationTag.CB_ACOUNT_NAME.key(), Strings.isNullOrEmpty(source.getAccount()) ? "unknown" : source.getAccount());
-        result.put(DefaultApplicationTag.CB_USER_NAME.key(), Strings.isNullOrEmpty(source.getOwner()) ? "unknown" : source.getOwner());
         return result;
     }
 

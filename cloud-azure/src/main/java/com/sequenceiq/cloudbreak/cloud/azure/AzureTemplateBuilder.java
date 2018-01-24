@@ -1,5 +1,6 @@
 package com.sequenceiq.cloudbreak.cloud.azure;
 
+import static com.sequenceiq.cloudbreak.common.type.CloudbreakResourceType.cloudbreakResourceTypes;
 import static com.sequenceiq.cloudbreak.util.FreeMarkerTemplateUtils.processTemplateIntoString;
 
 import java.io.IOException;
@@ -89,6 +90,7 @@ public class AzureTemplateBuilder {
             model.put("noPublicIp", azureUtils.isPrivateIp(network));
             model.put("noFirewallRules", azureUtils.isNoSecurityGroups(network));
             model.put("userDefinedTags", cloudStack.getTags());
+            model.putAll(cloudbreakResourceTypes());
             String generatedTemplate = processTemplateIntoString(getTemplate(cloudStack), model);
             LOGGER.debug("Generated Arm template: {}", generatedTemplate);
             return generatedTemplate;

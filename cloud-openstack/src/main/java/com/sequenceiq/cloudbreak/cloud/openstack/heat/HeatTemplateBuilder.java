@@ -1,5 +1,6 @@
 package com.sequenceiq.cloudbreak.cloud.openstack.heat;
 
+import static com.sequenceiq.cloudbreak.common.type.CloudbreakResourceType.cloudbreakResourceTypes;
 import static com.sequenceiq.cloudbreak.util.FreeMarkerTemplateUtils.processTemplateIntoString;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNoneEmpty;
@@ -60,6 +61,7 @@ public class HeatTemplateBuilder {
             model.put("existingNetwork", modelContext.existingNetwork);
             model.put("existingSubnet", modelContext.existingSubnet);
             model.put("network", modelContext.neutronNetworkView);
+            model.putAll(cloudbreakResourceTypes());
             AvailabilityZone az = modelContext.location.getAvailabilityZone();
             if (az != null && az.value() != null) {
                 model.put("availability_zone", az.value());

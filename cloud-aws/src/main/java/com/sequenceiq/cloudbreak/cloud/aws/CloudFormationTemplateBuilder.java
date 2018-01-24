@@ -1,5 +1,6 @@
 package com.sequenceiq.cloudbreak.cloud.aws;
 
+import static com.sequenceiq.cloudbreak.common.type.CloudbreakResourceType.cloudbreakResourceTypes;
 import static com.sequenceiq.cloudbreak.util.FreeMarkerTemplateUtils.processTemplateIntoString;
 
 import java.io.IOException;
@@ -73,6 +74,7 @@ public class CloudFormationTemplateBuilder {
         model.put("dedicatedInstances", areDedicatedInstancesRequested(context.stack));
         model.put("availabilitySetNeeded", context.ac.getCloudContext().getLocation().getAvailabilityZone().value() != null);
         model.put("mapPublicIpOnLaunch", context.mapPublicIpOnLaunch);
+        model.putAll(cloudbreakResourceTypes());
         try {
             String template = processTemplateIntoString(new Template("aws-template", context.template, freemarkerConfiguration), model);
             return template.replaceAll("\\t|\\n| [\\s]+", "");
